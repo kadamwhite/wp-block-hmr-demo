@@ -49,9 +49,6 @@ module.exports = {
 		},
 		port,
 	},
-	optimization: {
-		nodeEnv: 'development',
-	},
 
 	// Permit importing @wordpress/* packages.
 	externals,

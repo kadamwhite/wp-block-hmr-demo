@@ -2,7 +2,6 @@
  * This file defines the configuration that is used for the production build.
  */
 const { join } = require( 'path' );
-const UglifyJsPlugin = require( 'uglifyjs-webpack-plugin' );
 
 const externals = require( './externals' );
 
@@ -30,16 +29,8 @@ module.exports = {
 
 	// Optimize output bundle.
 	optimization: {
-		minimizer: [ new UglifyJsPlugin( {
-			sourceMap: true,
-			uglifyOptions: {
-				output: {
-					comments: false,
-				},
-			},
-		} ) ],
+		minimize: true,
 		noEmitOnErrors: true,
-		nodeEnv: 'production',
 	},
 
 	// Specify where the code comes from.
