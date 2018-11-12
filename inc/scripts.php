@@ -22,6 +22,7 @@ function enqueue_block_editor_assets() {
 		'handle' => 'hmr-demo',
 		'scripts' => [
 			'wp-blocks',
+			'wp-data',
 			'wp-edit-post',
 			'wp-element',
 			'wp-i18n',

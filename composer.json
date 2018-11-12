@@ -1,6 +1,0 @@
-{
-  "require": {
-    "humanmade/coding-standards" : "dev-master"
-  },
-  "minimum-stability": "dev"
-}

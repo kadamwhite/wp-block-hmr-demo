@@ -4,10 +4,9 @@
 const { unlinkSync } = require( 'fs' );
 const onExit = require( 'signal-exit' );
 const webpack = require( 'webpack' );
-const HardSourceWebpackPlugin = require( 'hard-source-webpack-plugin' );
 const ManifestPlugin = require( 'webpack-manifest-plugin' );
 
-const { devServerPort, externals, filePath, loaders, stats } = require( './config-utils' );
+const { devServerPort, externals, filePath, srcPaths, stats } = require( './config-utils' );
 
 // Clean up manifest on exit.
 onExit( () => {
@@ -28,6 +27,7 @@ module.exports = {
 	mode: 'development',
 	devtool: 'cheap-module-source-map',
 	context: process.cwd(),
+
 	// Allow config to override shared devServer properties.
 	devServer: {
 		headers: {
@@ -43,6 +43,11 @@ module.exports = {
 	optimization: {
 		nodeEnv: 'development',
 	},
+
+	// Permit importing @wordpress/* packages.
+	externals,
+
+	// Specify where the code comes from.
 	entry: {
 		editor: filePath( 'src', 'index.js' ),
 	},
@@ -53,38 +58,23 @@ module.exports = {
 		filename: '[name].js',
 		publicPath,
 	},
-	externals,
+
 	module: {
 		strictExportPresence: true,
 		rules: [
-			// First, run the linter before Babel processes the JS.
-			loaders.eslint,
 			{
-				// "oneOf" will traverse all following loaders until one will
-				// match the requirements. If no loader matches, it will fall
-				// back to the "file" loader at the end of the loader list.
-				oneOf: [
-					// Inline any assets below a specified limit as data URLs to avoid requests.
-					loaders.url,
-					// Process JS with Babel.
-					loaders.js,
-					{
-						test: /\.scss$/,
-						use: [
-							require.resolve( 'style-loader' ),
-							// Process SASS into CSS.
-							loaders.css,
-							loaders.postcss,
-							loaders.sass,
-						],
-					},
-					// "file" loader makes sure any non-matching assets still get served.
-					// When you `import` an asset you get its filename.
-					loaders.file,
-				],
+				// Process JS with Babel.
+				test: /\.js$/,
+				include: srcPaths,
+				loader: require.resolve( 'babel-loader' ),
+				options: {
+					// Cache compilation results in ./node_modules/.cache/babel-loader/
+					cacheDirectory: true,
+				},
 			},
 		],
 	},
+
 	plugins: [
 		// Generate a manifest file which contains a mapping of all asset filenames
 		// to their corresponding output file so that PHP can pick up their paths.
@@ -95,18 +85,5 @@ module.exports = {
 		} ),
 		// Enable HMR.
 		new webpack.HotModuleReplacementPlugin(),
-		// Faster rebuilds.
-		new HardSourceWebpackPlugin( {
-			cacheDirectory: filePath( 'node_modules', '.cache', 'hard-source', '[confighash]' ),
-			info: {
-				level: 'warn',
-			},
-			cachePrune: {
-				// Only delete caches older than two days.
-				maxAge: 2 * 24 * 60 * 60 * 1000,
-				// Only delete caches if cache folder is > 50mb.
-				sizeThreshold: 50 * 1024 * 1024,
-			},
-		} ),
 	],
 };

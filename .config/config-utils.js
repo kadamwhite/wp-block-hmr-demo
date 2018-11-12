@@ -29,6 +29,7 @@ const devServerPort = () => parseInt( process.env.PORT, 10 ) || 3001;
  */
 const externals = [
 	'blocks',
+	'data',
 	'edit-post',
 	'element',
 	'i18n',
@@ -68,76 +69,10 @@ const stats = {
 	warnings: true,
 };
 
-/**
- * Loader configuration objects which can be re-used in the dev and prod build config files.
- */
-const loaders = {
-	eslint: {
-		test: /\.(js|jsx|mjs)$/,
-		include: srcPaths,
-		enforce: 'pre',
-		use: [ {
-			options: {
-				eslintPath: require.resolve( 'eslint' ),
-			},
-			loader: require.resolve( 'eslint-loader' ),
-		} ],
-	},
-	url: {
-		test: /\.(png|jpg|jpeg|gif|svg|woff|woff2|eot|ttf)$/,
-		loader: require.resolve( 'url-loader' ),
-		options: {
-			limit: 10000,
-		},
-	},
-	js: {
-		test: /\.js$/,
-		include: srcPaths,
-		loader: require.resolve( 'babel-loader' ),
-		options: {
-			// Cache compilation results in ./node_modules/.cache/babel-loader/
-			cacheDirectory: true,
-		},
-	},
-	css: {
-		loader: require.resolve( 'css-loader' ),
-		options: {
-			importLoaders: 1,
-		},
-	},
-	postcss: {
-		loader: require.resolve( 'postcss-loader' ),
-		options: {
-			ident: 'postcss',
-			plugins: () => [
-				postcssFlexbugsFixes,
-				autoprefixer( {
-					browsers: [
-						'>1%',
-						'last 4 versions',
-						'Firefox ESR',
-						'not ie < 10',
-					],
-					flexbox: 'no-2009',
-				} ),
-			],
-		},
-	},
-	sass: {
-		loader: require.resolve( 'sass-loader' ),
-	},
-	file: {
-		// Exclude `js`, `html` and `json`, but match anything else.
-		exclude: [ /\.js$/, /\.html$/, /\.json$/ ],
-		loader: require.resolve( 'file-loader' ),
-	},
-};
-
 module.exports = {
 	devServerPort,
 	externals,
 	filePath,
 	srcPaths,
 	stats,
-	loaders,
 };

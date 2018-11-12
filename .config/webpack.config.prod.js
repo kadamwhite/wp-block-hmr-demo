@@ -1,10 +1,9 @@
 /**
  * This file defines the configuration that is used for the production build.
  */
-const MiniCssExtractPlugin = require( 'mini-css-extract-plugin' );
 const UglifyJsPlugin = require( 'uglifyjs-webpack-plugin' );
 
-const { filePath, externals, loaders, stats } = require( './config-utils' );
+const { filePath, externals, srcPaths, stats } = require( './config-utils' );
 
 /**
  * Theme production build configuration.
@@ -16,6 +15,9 @@ module.exports = {
 
 	// Clean up build output
 	stats,
+
+	// Permit importing @wordpress/* packages.
+	externals,
 
 	// Optimize output bundle.
 	optimization: {
@@ -30,6 +32,8 @@ module.exports = {
 		noEmitOnErrors: true,
 		nodeEnv: 'production',
 	},
+
+	// Specify where the code comes from.
 	entry: {
 		editor: filePath( 'src', 'index.js' ),
 	},
@@ -39,43 +43,16 @@ module.exports = {
 		path: filePath( 'build' ),
 		filename: '[name].js',
 	},
-	externals,
+
 	module: {
 		strictExportPresence: true,
 		rules: [
-			// First, run the linter before Babel processes the JS.
-			loaders.eslint,
 			{
-				// "oneOf" will traverse all following loaders until one will
-				// match the requirements. If no loader matches, it will fall
-				// back to the "file" loader at the end of the loader list.
-				oneOf: [
-					// Inline any assets below a specified limit as data URLs to avoid requests.
-					loaders.url,
-					// Process JS with Babel.
-					loaders.js,
-					{
-						test: /\.scss$/,
-						use: [
-							// Instead of using style-loader, extract CSS to its own file.
-							MiniCssExtractPlugin.loader,
-							// Process SASS into CSS.
-							loaders.css,
-							loaders.postcss,
-							loaders.sass,
-						],
-					},
-					// "file" loader makes sure any non-matching assets still get served.
-					// When you `import` an asset you get its filename.
-					loaders.file,
-				],
+				// Process JS with Babel.
+				test: /\.js$/,
+				include: srcPaths,
+				loader: require.resolve( 'babel-loader' ),
 			},
 		],
 	},
-
-	plugins: [
-		new MiniCssExtractPlugin( {
-			filename: '[name].css',
-		} ),
-	],
 };
