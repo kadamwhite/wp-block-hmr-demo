@@ -1,9 +1,10 @@
 /**
  * This file defines the configuration that is used for the production build.
  */
+const { join } = require( 'path' );
 const UglifyJsPlugin = require( 'uglifyjs-webpack-plugin' );
 
-const { filePath, externals, srcPaths, stats } = require( './config-utils' );
+const externals = require( './externals' );
 
 /**
  * Theme production build configuration.
@@ -14,7 +15,15 @@ module.exports = {
 	context: process.cwd(),
 
 	// Clean up build output
-	stats,
+	stats: {
+		all: false,
+		assets: true,
+		colors: true,
+		errors: true,
+		performance: true,
+		timings: true,
+		warnings: true,
+	},
 
 	// Permit importing @wordpress/* packages.
 	externals,
@@ -35,12 +44,11 @@ module.exports = {
 
 	// Specify where the code comes from.
 	entry: {
-		editor: filePath( 'src', 'index.js' ),
+		editor: join( process.cwd(), 'src', 'index.js' ),
 	},
 	output: {
-		// Add /* filename */ comments to generated require()s in the output.
 		pathinfo: false,
-		path: filePath( 'build' ),
+		path: join( process.cwd(), 'build' ),
 		filename: '[name].js',
 	},
 
@@ -50,7 +58,7 @@ module.exports = {
 			{
 				// Process JS with Babel.
 				test: /\.js$/,
-				include: srcPaths,
+				include: [ join( process.cwd(), 'src' ) ],
 				loader: require.resolve( 'babel-loader' ),
 			},
 		],

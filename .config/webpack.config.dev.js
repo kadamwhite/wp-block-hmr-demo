@@ -2,11 +2,12 @@
  * This file defines the configuration for development and dev-server builds.
  */
 const { unlinkSync } = require( 'fs' );
+const { join } = require( 'path' );
 const onExit = require( 'signal-exit' );
 const webpack = require( 'webpack' );
 const ManifestPlugin = require( 'webpack-manifest-plugin' );
 
-const { devServerPort, externals, filePath, srcPaths, stats } = require( './config-utils' );
+const externals = require( './externals' );
 
 // Clean up manifest on exit.
 onExit( () => {
@@ -17,7 +18,7 @@ onExit( () => {
 	}
 } );
 
-const port = devServerPort();
+const port = parseInt( process.env.PORT, 10 ) || 3030;
 const publicPath = `http://localhost:${ port }/build/`;
 
 /**
@@ -37,7 +38,15 @@ module.exports = {
 		watchOptions: {
 			aggregateTimeout: 300,
 		},
-		stats,
+		stats: {
+			all: false,
+			assets: true,
+			colors: true,
+			errors: true,
+			performance: true,
+			timings: true,
+			warnings: true,
+		},
 		port,
 	},
 	optimization: {
@@ -49,12 +58,12 @@ module.exports = {
 
 	// Specify where the code comes from.
 	entry: {
-		editor: filePath( 'src', 'index.js' ),
+		editor: join( process.cwd(), 'src', 'index.js' ),
 	},
 	output: {
 		// Add /* filename */ comments to generated require()s in the output.
 		pathinfo: false,
-		path: filePath( 'build' ),
+		path: join( process.cwd(), 'build' ),
 		filename: '[name].js',
 		publicPath,
 	},
@@ -65,7 +74,7 @@ module.exports = {
 			{
 				// Process JS with Babel.
 				test: /\.js$/,
-				include: srcPaths,
+				include: [ join( process.cwd(), 'src' ) ],
 				loader: require.resolve( 'babel-loader' ),
 				options: {
 					// Cache compilation results in ./node_modules/.cache/babel-loader/

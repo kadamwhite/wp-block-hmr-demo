@@ -8,7 +8,6 @@ After running `npm install`, these key commands will let you test the plugin loc
 
 - `npm start`: Run the Webpack development server. WordPress will automatically detect and load the script from the dev server based on the presence of the `asset-manifest.json` the dev server outputs into the build directory. Hot reloading is only provided while the dev server is running.
 - `npm run build`: Build the application into the `build/` directory.
-- `npm run lint`: Run PHPCS and ESLint to check for style issues.
 
 ## License
 
