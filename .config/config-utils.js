@@ -29,9 +29,6 @@ const devServerPort = () => parseInt( process.env.PORT, 10 ) || 3001;
  */
 const externals = [
 	'blocks',
-	'components',
-	'compose',
-	'data',
 	'edit-post',
 	'element',
 	'i18n',
