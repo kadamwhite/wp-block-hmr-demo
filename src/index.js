@@ -71,6 +71,7 @@ const autoload = ( {
 let selectedBlockId = null;
 const storeSelectedBlock = () => {
 	selectedBlockId = select( 'core/editor' ).getSelectedBlockClientId();
+	dispatch( 'core/editor' ).clearSelectedBlock();
 };
 const refreshAllBlocks = () => {
 	// Refresh all blocks by iteratively selecting each one.
