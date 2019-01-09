@@ -39,6 +39,7 @@ const autoload = ( {
 		before();
 
 		const context = getContext();
+		const changedNames = [];
 		context.keys().forEach( key => {
 			const module = context( key );
 			if ( module === cache[ key ] ) {
@@ -51,10 +52,11 @@ const autoload = ( {
 			}
 			// Register new module and update cache.
 			register( module );
+			changedNames.push( module.name );
 			cache[ key ] = module;
 		} );
 
-		after();
+		after( changedNames );
 
 		// Return the context for HMR initialization.
 		return context;
@@ -73,10 +75,12 @@ const storeSelectedBlock = () => {
 	selectedBlockId = select( 'core/editor' ).getSelectedBlockClientId();
 	dispatch( 'core/editor' ).clearSelectedBlock();
 };
-const refreshAllBlocks = () => {
+const refreshAllBlocks = ( changedNames = [] ) => {
 	// Refresh all blocks by iteratively selecting each one.
-	select( 'core/editor' ).getBlocks().forEach( ( { clientId } ) => {
-		dispatch( 'core/editor' ).selectBlock( clientId );
+	select( 'core/editor' ).getBlocks().forEach( ( { name, clientId } ) => {
+		if ( changedNames.includes( name ) ) {
+			dispatch( 'core/editor' ).selectBlock( clientId );
+		}
 	} );
 	// Reselect whatever was selected in the beginning.
 	if ( selectedBlockId ) {
